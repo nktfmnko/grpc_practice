@@ -1,0 +1,79 @@
+syntax = "proto3";
+
+package spaceship.v1;
+
+option go_package = "grpc-practice/pkg/proto/spaceship/v1;spaceship_v1";
+
+import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/wrappers.proto";
+
+service SpaceshipServiceV1{
+  rpc Create(CreateRequest) returns (CreateResponse);
+  rpc Get(GetRequest) returns (GetResponse);
+  rpc Update(UpdateRequest) returns (UpdateResponse);
+  rpc Delete(DeleteRequest) returns (google.protobuf.Empty);
+}
+
+message SpaceshipInfo{
+  string name = 1;
+
+  google.protobuf.StringValue description = 2;
+
+  string model = 3;
+
+  string manufacturer = 4;
+
+  double price = 5;
+}
+
+message SpaceshipUpdateInfo{
+  google.protobuf.StringValue name = 1;
+
+  google.protobuf.StringValue description = 2;
+
+  google.protobuf.StringValue model = 3;
+
+  google.protobuf.StringValue manufacturer = 4;
+
+  google.protobuf.DoubleValue price = 5;
+}
+
+message Spaceship{
+  string uuid = 1;
+
+  SpaceshipInfo info = 2;
+
+  google.protobuf.Timestamp created_at = 3;
+
+  google.protobuf.Timestamp updated_at = 4;
+}
+
+message CreateRequest{
+  SpaceshipInfo info = 1;
+}
+
+message CreateResponse{
+  Spaceship spaceship = 1;
+}
+
+message GetRequest{
+  string uuid = 1;
+}
+
+message GetResponse{
+  Spaceship spaceship = 1;
+}
+
+message UpdateRequest{
+  string uuid = 1;
+  SpaceshipUpdateInfo update_info = 2;
+}
+
+message UpdateResponse{
+  Spaceship spaceship = 1;
+}
+
+message DeleteRequest{
+  string uuid = 1;
+}
