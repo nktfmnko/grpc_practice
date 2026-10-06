@@ -8,6 +8,7 @@ package spaceship_v1
 
 import (
 	_ "github.com/envoyproxy/protoc-gen-validate/validate"
+	_ "google.golang.org/genproto/googleapis/api/annotations"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	emptypb "google.golang.org/protobuf/types/known/emptypb"
@@ -565,7 +566,7 @@ var File_proto_spaceship_v1_spaceship_proto protoreflect.FileDescriptor
 
 const file_proto_spaceship_v1_spaceship_proto_rawDesc = "" +
 	"\n" +
-	"\"proto/spaceship/v1/spaceship.proto\x12\fspaceship.v1\x1a\x1bgoogle/protobuf/empty.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1egoogle/protobuf/wrappers.proto\x1a\x17validate/validate.proto\"\xbe\x01\n" +
+	"\"proto/spaceship/v1/spaceship.proto\x12\fspaceship.v1\x1a\x1bgoogle/protobuf/empty.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1egoogle/protobuf/wrappers.proto\x1a\x17validate/validate.proto\x1a\x1cgoogle/api/annotations.proto\"\xbe\x01\n" +
 	"\rSpaceshipInfo\x12\x1d\n" +
 	"\x04name\x18\x01 \x01(\tB\t\xfaB\x06r\x04\x10\x03\x182R\x04name\x12>\n" +
 	"\vdescription\x18\x02 \x01(\v2\x1c.google.protobuf.StringValueR\vdescription\x12\x14\n" +
@@ -601,12 +602,12 @@ const file_proto_spaceship_v1_spaceship_proto_rawDesc = "" +
 	"\x0eUpdateResponse\x125\n" +
 	"\tspaceship\x18\x01 \x01(\v2\x17.spaceship.v1.SpaceshipR\tspaceship\"#\n" +
 	"\rDeleteRequest\x12\x12\n" +
-	"\x04uuid\x18\x01 \x01(\tR\x04uuid2\x99\x02\n" +
-	"\x12SpaceshipServiceV1\x12C\n" +
-	"\x06Create\x12\x1b.spaceship.v1.CreateRequest\x1a\x1c.spaceship.v1.CreateResponse\x12:\n" +
-	"\x03Get\x12\x18.spaceship.v1.GetRequest\x1a\x19.spaceship.v1.GetResponse\x12C\n" +
-	"\x06Update\x12\x1b.spaceship.v1.UpdateRequest\x1a\x1c.spaceship.v1.UpdateResponse\x12=\n" +
-	"\x06Delete\x12\x1b.spaceship.v1.DeleteRequest\x1a\x16.google.protobuf.EmptyB3Z1grpc-practice/pkg/proto/spaceship/v1;spaceship_v1b\x06proto3"
+	"\x04uuid\x18\x01 \x01(\tR\x04uuid2\xa0\x03\n" +
+	"\x12SpaceshipServiceV1\x12a\n" +
+	"\x06Create\x12\x1b.spaceship.v1.CreateRequest\x1a\x1c.spaceship.v1.CreateResponse\"\x1c\x82\xd3\xe4\x93\x02\x16:\x01*\"\x11/api/v1/spaceship\x12\\\n" +
+	"\x03Get\x12\x18.spaceship.v1.GetRequest\x1a\x19.spaceship.v1.GetResponse\" \x82\xd3\xe4\x93\x02\x1a\x12\x18/api/v1/spaceship/{uuid}\x12h\n" +
+	"\x06Update\x12\x1b.spaceship.v1.UpdateRequest\x1a\x1c.spaceship.v1.UpdateResponse\"#\x82\xd3\xe4\x93\x02\x1d:\x01*2\x18/api/v1/spaceship/{uuid}\x12_\n" +
+	"\x06Delete\x12\x1b.spaceship.v1.DeleteRequest\x1a\x16.google.protobuf.Empty\" \x82\xd3\xe4\x93\x02\x1a*\x18/api/v1/spaceship/{uuid}B3Z1grpc-practice/pkg/proto/spaceship/v1;spaceship_v1b\x06proto3"
 
 var (
 	file_proto_spaceship_v1_spaceship_proto_rawDescOnce sync.Once

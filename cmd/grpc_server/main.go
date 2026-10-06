@@ -2,10 +2,13 @@ package main
 
 import (
 	"context"
+	"errors"
+	"fmt"
 	"grpc_practice/internal/interceptor"
 	spaceship_v1 "grpc_practice/pkg/proto/spaceship/v1"
 	"log"
 	"net"
+	"net/http"
 	"os"
 	"os/signal"
 	"sync"
@@ -13,15 +16,21 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/reflection"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/emptypb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
-const grpcAddr = "127.0.0.1:50051"
+const (
+	grpcAddr              = "localhost:50051"
+	httpAddr              = "localhost:8081"
+	httpReadHeaderTimeout = 10 * time.Second
+)
 
 type spaceshipService struct {
 	spaceship_v1.UnimplementedSpaceshipServiceV1Server
@@ -124,11 +133,10 @@ func (s *spaceshipService) Delete(_ context.Context, req *spaceship_v1.DeleteReq
 	return &emptypb.Empty{}, nil
 }
 
-func main() {
+func initGRPCServer(grpcAddr string, service spaceship_v1.SpaceshipServiceV1Server) (*grpc.Server, net.Listener, error) {
 	lis, err := net.Listen("tcp", grpcAddr)
 	if err != nil {
-		log.Printf("failed to listen: %v\n", err)
-		return
+		return nil, nil, fmt.Errorf("failed to listen: %w", err)
 	}
 
 	s := grpc.NewServer(
@@ -138,19 +146,68 @@ func main() {
 		),
 	)
 
-	service := &spaceshipService{
-		spaceships: make(map[string]*spaceship_v1.Spaceship),
-	}
-
 	spaceship_v1.RegisterSpaceshipServiceV1Server(s, service)
 
 	reflection.Register(s)
 
+	return s, lis, nil
+}
+
+func initHTTPServer(ctx context.Context, httpAddr, grpcAddr string) (*http.Server, error) {
+	mux := runtime.NewServeMux()
+	opts := []grpc.DialOption{grpc.WithTransportCredentials(insecure.NewCredentials())}
+
+	err := spaceship_v1.RegisterSpaceshipServiceV1HandlerFromEndpoint(
+		ctx,
+		mux,
+		grpcAddr,
+		opts,
+	)
+	if err != nil {
+		return nil, fmt.Errorf("failed to register gateway: %w", err)
+	}
+
+	gwServer := &http.Server{
+		Addr:              httpAddr,
+		Handler:           mux,
+		ReadHeaderTimeout: httpReadHeaderTimeout,
+	}
+
+	return gwServer, nil
+}
+
+func main() {
+	service := &spaceshipService{
+		spaceships: make(map[string]*spaceship_v1.Spaceship),
+	}
+
+	grpcServer, lis, err := initGRPCServer(grpcAddr, service)
+	if err != nil {
+		log.Printf("%v\n", err)
+		return
+	}
+
 	go func() {
 		log.Printf("gRPC server listening on %s\n", grpcAddr)
-		err = s.Serve(lis)
+		err = grpcServer.Serve(lis)
 		if err != nil {
 			log.Printf("failed to serve: %v\n", err)
+			return
+		}
+	}()
+
+	ctx := context.Background()
+	gwServer, err := initHTTPServer(ctx, httpAddr, grpcAddr)
+	if err != nil {
+		log.Printf("%v\n", err)
+		return
+	}
+
+	go func() {
+		log.Printf("HTTP server with gRPC-Gateway listening on %s\n", httpAddr)
+		err = gwServer.ListenAndServe()
+		if err != nil && !errors.Is(err, http.ErrServerClosed) {
+			log.Printf("failed to serve HTTP: %v\n", err)
 			return
 		}
 	}()
@@ -159,8 +216,19 @@ func main() {
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 	<-quit
 
+	if gwServer != nil {
+		shutdownCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		defer cancel()
+		err = gwServer.Shutdown(shutdownCtx)
+		if err != nil {
+			log.Printf("HTTP server shutdown err: %v\n", err)
+			return
+		}
+		log.Printf("HTTP server stopped")
+	}
+
 	log.Println("Shutting down gRPC server...")
-	s.GracefulStop()
+	grpcServer.GracefulStop()
 
 	log.Println("Server stopped")
 }
