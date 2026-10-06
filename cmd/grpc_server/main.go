@@ -132,7 +132,10 @@ func main() {
 	}
 
 	s := grpc.NewServer(
-		grpc.UnaryInterceptor(interceptor.ValidationUnaryServerInterceptor()),
+		grpc.ChainUnaryInterceptor(
+			interceptor.ValidationUnaryServerInterceptor(),
+			interceptor.ResponseTimeUnaryServerInterceptor(),
+		),
 	)
 
 	service := &spaceshipService{
