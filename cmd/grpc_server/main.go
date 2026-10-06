@@ -50,7 +50,7 @@ func (s *spaceshipService) Create(_ context.Context, req *spaceship_v1.CreateReq
 
 func (s *spaceshipService) Get(_ context.Context, req *spaceship_v1.GetRequest) (*spaceship_v1.GetResponse, error) {
 	s.mu.RLock()
-	defer s.mu.Unlock()
+	defer s.mu.RUnlock()
 
 	if req.GetUuid() == "" {
 		return nil, status.Error(codes.InvalidArgument, "uuid cannot be empty")
