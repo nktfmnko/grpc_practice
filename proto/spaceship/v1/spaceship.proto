@@ -7,6 +7,7 @@ option go_package = "grpc-practice/pkg/proto/spaceship/v1;spaceship_v1";
 import "google/protobuf/empty.proto";
 import "google/protobuf/timestamp.proto";
 import "google/protobuf/wrappers.proto";
+import "validate/validate.proto";
 
 service SpaceshipServiceV1{
   rpc Create(CreateRequest) returns (CreateResponse);
@@ -16,7 +17,7 @@ service SpaceshipServiceV1{
 }
 
 message SpaceshipInfo{
-  string name = 1;
+  string name = 1 [(validate.rules).string = {min_len: 3, max_len: 50}];
 
   google.protobuf.StringValue description = 2;
 

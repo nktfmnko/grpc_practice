@@ -3,6 +3,7 @@ module grpc_practice
 go 1.26
 
 require (
+	github.com/envoyproxy/protoc-gen-validate v1.3.3
 	github.com/google/uuid v1.6.0
 	google.golang.org/grpc v1.84.0
 	google.golang.org/protobuf v1.36.12

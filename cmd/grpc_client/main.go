@@ -42,7 +42,6 @@ func (c *SpaceshipClient) CreateSpaceship(
 	name, description, model, manufacturer string,
 	price float64,
 ) (*spaceship_v1.Spaceship, error) {
-
 	req := &spaceship_v1.CreateRequest{Info: &spaceship_v1.SpaceshipInfo{
 		Name:         name,
 		Description:  wrapperspb.String(description),

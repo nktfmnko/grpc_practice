@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"grpc_practice/internal/interceptor"
 	spaceship_v1 "grpc_practice/pkg/proto/spaceship/v1"
 	"log"
 	"net"
@@ -130,7 +131,9 @@ func main() {
 		return
 	}
 
-	s := grpc.NewServer()
+	s := grpc.NewServer(
+		grpc.UnaryInterceptor(interceptor.ValidationUnaryServerInterceptor()),
+	)
 
 	service := &spaceshipService{
 		spaceships: make(map[string]*spaceship_v1.Spaceship),

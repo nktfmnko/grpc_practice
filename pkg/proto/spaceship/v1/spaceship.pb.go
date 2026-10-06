@@ -7,6 +7,7 @@
 package spaceship_v1
 
 import (
+	_ "github.com/envoyproxy/protoc-gen-validate/validate"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	emptypb "google.golang.org/protobuf/types/known/emptypb"
@@ -564,9 +565,9 @@ var File_proto_spaceship_v1_spaceship_proto protoreflect.FileDescriptor
 
 const file_proto_spaceship_v1_spaceship_proto_rawDesc = "" +
 	"\n" +
-	"\"proto/spaceship/v1/spaceship.proto\x12\fspaceship.v1\x1a\x1bgoogle/protobuf/empty.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1egoogle/protobuf/wrappers.proto\"\xb3\x01\n" +
-	"\rSpaceshipInfo\x12\x12\n" +
-	"\x04name\x18\x01 \x01(\tR\x04name\x12>\n" +
+	"\"proto/spaceship/v1/spaceship.proto\x12\fspaceship.v1\x1a\x1bgoogle/protobuf/empty.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1egoogle/protobuf/wrappers.proto\x1a\x17validate/validate.proto\"\xbe\x01\n" +
+	"\rSpaceshipInfo\x12\x1d\n" +
+	"\x04name\x18\x01 \x01(\tB\t\xfaB\x06r\x04\x10\x03\x182R\x04name\x12>\n" +
 	"\vdescription\x18\x02 \x01(\v2\x1c.google.protobuf.StringValueR\vdescription\x12\x14\n" +
 	"\x05model\x18\x03 \x01(\tR\x05model\x12\"\n" +
 	"\fmanufacturer\x18\x04 \x01(\tR\fmanufacturer\x12\x14\n" +
