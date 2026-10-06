@@ -153,6 +153,25 @@ func initGRPCServer(grpcAddr string, service spaceship_v1.SpaceshipServiceV1Serv
 	return s, lis, nil
 }
 
+func initSwaggerUI(gwMux *runtime.ServeMux) http.Handler {
+	fileServer := http.FileServer(http.Dir("pkg/api"))
+	httpMux := http.NewServeMux()
+
+	httpMux.Handle("/api/", gwMux)
+
+	httpMux.Handle("/swagger-ui.html", fileServer)
+	httpMux.Handle("/swagger/swagger.swagger.json", fileServer)
+
+	httpMux.Handle("/", http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
+		if request.URL.Path == "/" {
+			http.Redirect(writer, request, "/swagger-ui.html", http.StatusMovedPermanently)
+			return
+		}
+		fileServer.ServeHTTP(writer, request)
+	}))
+	return httpMux
+}
+
 func initHTTPServer(ctx context.Context, httpAddr, grpcAddr string) (*http.Server, error) {
 	mux := runtime.NewServeMux()
 	opts := []grpc.DialOption{grpc.WithTransportCredentials(insecure.NewCredentials())}
@@ -167,9 +186,11 @@ func initHTTPServer(ctx context.Context, httpAddr, grpcAddr string) (*http.Serve
 		return nil, fmt.Errorf("failed to register gateway: %w", err)
 	}
 
+	handler := initSwaggerUI(mux)
+
 	gwServer := &http.Server{
 		Addr:              httpAddr,
-		Handler:           mux,
+		Handler:           handler,
 		ReadHeaderTimeout: httpReadHeaderTimeout,
 	}
 
